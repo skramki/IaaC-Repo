@@ -3,6 +3,9 @@ import boto3
 # Initialize the AWS SDK
 ec2_client = boto3.client('ec2')
 cloudwatch_client = boto3.client('cloudwatch')
+cloud_region=<enter your region>
+cloudaccount_id=<enter your account ID>
+cloudwatch_alarm_project_name=BAU_Demo_project
 
 # Define the CPU utilization Warning,High,Critical threshold for your alarms
 cpu_threshold_warning = 80.0
@@ -38,7 +41,7 @@ for reservation in instances['Reservations']:
             EvaluationPeriods=3,
             TreatMissingData='breaching',
             Dimensions=[{'Name': 'InstanceId', 'Value': instance_id}],
-            AlarmActions='arn:aws:sns:ap-southeast-1:278506630753:MCCY-UAT-BAU-Support',
+            AlarmActions='arn:aws:sns:{cloud_region}:{cloudaccount_id}:{cloudwatch_alarm_project_name}',
         )
         print(f'Created alarm {alarm_name_90} for instance {instance_id}')
 
@@ -56,7 +59,7 @@ for reservation in instances['Reservations']:
             EvaluationPeriods=3,
             TreatMissingData='breaching',
             Dimensions=[{'Name': 'InstanceId', 'Value': instance_id}],
-            AlarmActions='arn:aws:sns:ap-southeast-1:278506630753:MCCY-UAT-BAU-Support',
+            AlarmActions='arn:aws:sns:{cloud_region}:{cloudaccount_id}:{cloudwatch_alarm_project_name}',
         )
         print(f'Created alarm {alarm_name_90} for instance {instance_id}')
         
@@ -74,6 +77,6 @@ for reservation in instances['Reservations']:
             EvaluationPeriods=3,
             TreatMissingData='breaching',
             Dimensions=[{'Name': 'InstanceId', 'Value': instance_id}],
-            AlarmActions='arn:aws:sns:ap-southeast-1:278506630753:MCCY-UAT-BAU-Support',
+            AlarmActions='arn:aws:sns:{cloud_region}:{cloudaccount_id}:{cloudwatch_alarm_project_name}',
         )
         print(f'Created alarm {alarm_name_95} for instance {instance_id}')
