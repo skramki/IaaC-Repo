@@ -3,6 +3,8 @@ import boto3
 # Initialize the AWS SDK
 ec2_client = boto3.client('ec2')
 cloudwatch_client = boto3.client('cloudwatch')
+
+# Cloud Account Inputs
 cloud_region=<enter your region>
 cloudaccount_id=<enter your account ID>
 cloudwatch_alarm_project_name=BAU_Demo_project
