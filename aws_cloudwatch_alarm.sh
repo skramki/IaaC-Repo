@@ -25,7 +25,7 @@ SEND_EMAIL_ID="YOUREMAIL@DOMAIN.com>
 aws ec2 describe-instances --filters Name=tag-key,Values=Name --query 'Reservations[*].Instances[*].{Instance:InstanceId,Name:Tags[?Key==`Name`]|[0].Value}' --output text > INSTANCE_NAME.txt
 ## Create a CloudWatch alarm for CPU Metrics threshold limits
 CLOUDWATCH_ALARM_CPU() {
-for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "mccy" | egrep -v "donot|clone|restore|discover"`
+for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "project" | egrep -v "donot|clone|restore|discover"`
 do
 INSTANCE_NAME=`cat INSTANCE_NAME.txt | egrep -w $INSTANCE_ID | awk '{print $2}'`
 # CloudWatch Alarm for WARNING CPU Utilization > Than $CPU_THRESHOLD_WARNING%
@@ -38,7 +38,7 @@ done
 }
 ## Create a CloudWatch alarm for Memory Metrics threshold limits
 CLOUDWATCH_ALARM_MEMORY() {
-for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "mccy" | egrep -v "donot|clone|restore|discover"`
+for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "project" | egrep -v "donot|clone|restore|discover"`
 do
 INSTANCE_NAME=`cat INSTANCE_NAME.txt | egrep -w $INSTANCE_ID | awk '{print $2}'`
 # CloudWatch Alarm for WARNING Memory Utilization > Than $CPU_THRESHOLD_WARNING%
@@ -51,7 +51,7 @@ done
 }
 ## Create a CloudWatch alarm for Linux File System Utilization Metrics threshold limits
 CLOUDWATCH_ALARM_DISK_LINUX() {
-for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "mccy" | egrep -v "donot|clone|restore|discover"`
+for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "project" | egrep -v "donot|clone|restore|discover"`
 do
 for DISK_PATH in $DISK_1 $DISK_2 $DISK_3
 do
@@ -67,7 +67,7 @@ done
 }
 ## Create a CloudWatch alarm for Windows Disk Utilization Metrics threshold limits
 CLOUDWATCH_ALARM_DISK_WINDOWS() {
-for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "mccy" | egrep -v "donot|clone|restore|discover"`
+for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "project" | egrep -v "donot|clone|restore|discover"`
 do
 INSTANCE_NAME=`cat INSTANCE_NAME.txt | egrep -w $INSTANCE_ID | awk '{print $2}'`
 # CloudWatch Alarm Windows for WARNING Disk Utilization > Than $CPU_THRESHOLD_WARNING%
@@ -80,7 +80,7 @@ done
 }
 ## Create a CloudWatch alarm for Instance/Node Status
 CLOUDWATCH_ALARM_NODE() {
-for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "mccy" | egrep -v "donot|clone|restore|discover"`
+for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "project" | egrep -v "donot|clone|restore|discover"`
 do
 INSTANCE_NAME=`cat INSTANCE_NAME.txt | egrep -w $INSTANCE_ID | awk '{print $2}'`
 # CloudWatch Alarm for Node Status
