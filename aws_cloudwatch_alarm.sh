@@ -49,7 +49,7 @@ aws cloudwatch put-metric-alarm --alarm-name "MemoryAlarm-$INSTANCE_NAME-$CPU_TH
 aws cloudwatch put-metric-alarm --alarm-name "MemoryAlarm-$INSTANCE_NAME-$CPU_THRESHOLD_CRITICAL" --alarm-description "Memory Utilization Alarm $CPU_THRESHOLD_CRITICAL%" --actions-enabled --metric-name "Memory-Utilization" --namespace "AWS/EC2" --statistic "Average" --period $TIME_PERIOD_ALARM --threshold $CPU_THRESHOLD_CRITICAL --comparison-operator "GreaterThanThreshold" --evaluation-periods $RECUR_PERIOD --treat-missing-data "breaching" --dimensions "Name=InstanceID,Value=$INSTANCE_ID" --alarm-actions "$ARN_UR"
 done
 }
-## Create a CloudWatch alarm for Disk Utilization Linux Metrics threshold limits
+## Create a CloudWatch alarm for Linux File System Utilization Metrics threshold limits
 CLOUDWATCH_ALARM_DISK_LINUX() {
 for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "mccy" | egrep -v "donot|clone|restore|discover"`
 do
@@ -78,7 +78,7 @@ aws cloudwatch put-metric-alarm --alarm-name "DiskAlarm-$INSTANCE_NAME_C_DRIVE-$
 aws cloudwatch put-metric-alarm --alarm-name "DiskAlarm-$INSTANCE_NAME_C_DRIVE-$CPU_THRESHOLD_CRITICAL" --alarm-description "Disk Utilization Alarm $CPU_THRESHOLD_CRITICAL%" --actions-enabled --metric-name "Disk-Space-Utilization" --statistic "Average" --objectname "LogicalDisk" --instance "C:" --namespace "AWS/EC2" --statistic "Average" --period $TIME_PERIOD_ALARM --threshold $CPU_THRESHOLD_CRITICAL --comparison-operator "GreaterThanThreshold" --evaluation-periods $RECUR_PERIOD --treat-missing-data "breaching" --dimensions "Name=InstanceID,Value=$INSTANCE_ID" --alarm-actions "$ARN_UR"
 done
 }
-## Create a CloudWatch alarm for Linux File System Utilization Metrics threshold limits
+## Create a CloudWatch alarm for Instance/Node Status
 CLOUDWATCH_ALARM_NODE() {
 for INSTANCE_ID in `cat INSTANCE_NAME.txt | egrep "mccy" | egrep -v "donot|clone|restore|discover"`
 do
