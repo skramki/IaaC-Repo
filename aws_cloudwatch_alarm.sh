@@ -1,8 +1,8 @@
 #!/bin/bash
-# Purpose:                 Create Cloudwatch Alarm metrics for CPU, Memory, Disk utilization & Node Health status
-# Script:                  cloudwatch_alarm.sh
-# How To Execute:          Run from AWS CloudShell prompt (or) Run aws configuration with Account detail
-# Input variable Change:   Value required before executing this script Account ID, SNS Project Name, NOC Email ID
+# Description:					        Purpose to enable Cloudwatch metrics alarm with Warning, High, Critical with SNS Topic creation includes email subscribtion
+# File Name:                    cloudwatch_alarm.sh
+# How To Execute:               Run from CloudShell prompt # sh cloudwatch_alarm.sh
+# Input variable Change:        Value required before executing this script Zone_ID, SNS Project Name, Send_Email_ID, Short_Name (if needed)
 # Input Variable
 ZONE_ID=ap-southeast-1
 ACC_ID=`aws sts get-caller-identity --query "Account" --output text`
