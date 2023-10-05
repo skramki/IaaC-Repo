@@ -1,0 +1,21 @@
+AWS CLI Quick Help
+
+## Describe Volume ID by Instance ID
+
+aws ec2 describe-volumes --query 'Volumes[*].Attachments[].{VolumeID:VolumeId,InstanceID:InstanceId}' --output table
+
+
+## Describe Instances Query
+
+# Query Instance ID, Name, Type State, Platform, State, Private IP, Tags,StateTransitionReason 
+
+aws ec2 describe-instances --query 'Reservations[].Instances[].[InstanceId,Tags[?Key==`Name`].Value | [0],InstanceType,Platform,State.Name,PrivateIpAddress,StateTransitionReason,Tags[?Key==`Name`].Value | [0]]' --output table
+
+# Query Instance ID, Name, Type State, Platform, State, Private IP, Tags
+aws ec2 describe-instances --query 'Reservations[].Instances[].[InstanceId,Tags[?Key==`Name`].Value | [0],InstanceType,Platform,State.Name,PrivateIpAddress,Tags[?Key==`Name`].Value | [0]]' --output table
+
+# Query Instance ID, EBS Volume
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value,InstanceId,BlockDeviceMappings[*].Ebs.VolumeId]' --output text
+
+
+
