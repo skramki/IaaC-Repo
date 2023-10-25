@@ -1,0 +1,462 @@
+https://github.com/CiscoDevNet 
+
+
+------------------- Beginning of File ----------------------------
+
+ 
+--------------------Beginning of AMI info----------------------------
+Ubuntu Server 16.04 LTS (HVM), SSD Volume Type - ami-5055cd3f --- ubuntu
+Amazon Linux AMI 2017.09.1 (HVM), SSD Volume Type - ami-5652ce39 --- ec2-user
+
+To find metadata from the device console:
+curl http://169.254.169.254/latest/meta-data/
+curl http://169.254.169.254/latest/meta-data/public-ipv4
+
+wget http://169.254.169.254/latest/meta-data/public-ipv4
+
+chmod 400 Key-HP1.pem
+ssh -i Key-HP1.pem ec2-user@10.1.2.64
+--------------------Beginning FlowLogs-----------------------------
+[version, accountid, interfaceid, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytes, start, end, action, logstatus]
+
+-------------------Beginning of profiles---------------------------
+Config and credentials are in this folder:
+C:\Users\manuel.villate\.aws
+
+Create a new profile for the role in the .aws/config file
+
+[profile prodaccess]
+role_arn = arn:aws:iam::123456789012:role/ProductionAccessRole
+source_profile = default
+
+$ aws iam list-users --profile prodaccess
+Svtyeo*A)aF*7RZc6uDdqyCdGNWBoNI!
+pzIU=Bg8XCU;;ba&rbdUeRUoQagDD?=q
+
+--------------------Beginning of CLI commands-----------------------------
+aws --ver
+aws ec2 describe-prefix-lists
+aws ec2 describe-availability-zones
+aws ec2 describe-regions
+aws ec2 describe-vpcs
+aws ec2 describe-vpcs --query "Vpcs[*].{ID:VpcId,CIDR:CidrBlock}"
+aws ec2 describe-vpcs --filters Name="vpc-id",Values="vpc-42891e29"
+
+
+aws ec2  describe-vpc-peering-connections --query "VpcPeeringConnections[*].{Name:Tags[0].Value, VpcPeeringId:VpcPeeringConnectionId, Status:Status.Message, AccepterID:AccepterVpcInfo.VpcId, AccepterCidr:AccepterVpcInfo.CidrBlock, RequesterID:RequesterVpcInfo.VpcId, RequesterCidr:RequesterVpcInfo.CidrBlock }" --profile SharedServices1
+aws ec2 describe-internet-gateways
+aws ec2 describe-tags
+aws ec2 describe-tags --filter Name=tag:Owner,Values=Manu
+aws ec2 describe-subnets
+aws ec2 describe-subnets --query "Subnets[*].{SubnetID:SubnetId, CIDR:CidrBlock, Public: MapPublicIpOnLaunch}"
+aws ec2 describe-subnets --filter Name="tag-value",Values="Subnet_External"
+
+aws ec2 describe-instances --query "Reservations[*].Instances[*].{InstanceId:InstanceId, PublicIp:PublicIpAddress, PrivateIp:PrivateIpAddress}" 
+aws ec2 describe-instances --query "Reservations[*].Instances[*].{InstanceId:InstanceId, State:State.Name, PublicIpAddress:PublicIpAddress, PrivateIpAddress:PrivateIpAddress}" 
+aws ec2 describe-instances --profile Shared --query "Reservations[*].Instances[*].{InstanceId:InstanceId, InstanceType:InstanceType, Platform:Platform, PrivateIpAddress:PrivateIpAddress, VpcId:NetworkInterfaces[0].VpcId, SubnetId:NetworkInterfaces[0].SubnetId}" --output table
+aws ec2 describe-instances --profile Shared --query "Reservations[*].Instances[*].{InstanceId:InstanceId, InstanceType:InstanceType, Platform:Platform, PrivateIpAddress:PrivateIpAddress, VpcId:NetworkInterfaces[0].VpcId, SubnetId:NetworkInterfaces[0].SubnetId, State:State.Name, AZ:Placement.AvailabilityZone, Tags:Tags[?Key==`Name`].Value}" --output text > SharedInstances.txt
+aws ec2 describe-instances --profile Shared --query "Reservations[*].Instances[*].[InstanceId, InstanceType, Platform, PrivateIpAddress, NetworkInterfaces[0].VpcId, NetworkInterfaces[0].SubnetId, State.Name, Placement.AvailabilityZone, Tags[?Key==`Name`].Value[] | [0]]"
+aws ec2 describe-instances --profile Shared --query "Reservations[*].Instances[*].{InstanceId:InstanceId, InstanceType:InstanceType, Platform:Platform, PrivateIpAddress:PrivateIpAddress, VpcId:NetworkInterfaces[0].VpcId, SubnetId:NetworkInterfaces[0].SubnetId, State:State.Name, AZ:Placement.AvailabilityZone, Name:Tags[?Key==`Name`].Value | [0], Project:Tags[?Key==`Project`].Value | [0]}"  --output table
+aws ec2 describe-volumes --query "Volumes[*].Attachments[*].{VolumeId:VolumeId, State:State, InstanceId:InstanceId}" 
+aws ec2 describe-instances --profile Live --query "Reservations[*].Instances[*].{InstanceId:InstanceId, InstanceType:InstanceType, Platform:Platform, PrivateIpAddress:PrivateIpAddress, VpcId:NetworkInterfaces[0].VpcId, SubnetId:NetworkInterfaces[0].SubnetId, State:State.Name, AZ:Placement.AvailabilityZone, Name:Tags[?Key==`Name`].Value | [0], TagCount:length(Tags[*])}"  --output text
+
+
+aws ec2 describe-security-groups --group-id sg-428d2c2f
+
+aws ec2 allocate-address --domain "vpc" --region eu-central-1
+
+
+aws ec2 create-vpc --cidr-block 10.2.0.0/16 
+
+aws ec2 create-subnet --cidr-block 10.0.100.0/24 --vpc-id vpc-bada67d1 --availability-zone eu-central-1c
+aws ec2 modify-subnet-attribute --subnet-id subnet-1e910253 --map-public-ip-on-launch
+aws ec2 create-subnet --cidr-block 10.0.200.0/24 --vpc-id vpc-bada67d1 --availability-zone eu-central-1c
+aws ec2 create-subnet --cidr-block 10.0.110.0/24 --vpc-id vpc-bada67d1 --availability-zone eu-central-1a
+aws ec2 modify-subnet-attribute --subnet-id subnet-d8b2f3b3 --map-public-ip-on-launch
+aws ec2 create-subnet --cidr-block 10.0.210.0/24 --vpc-id vpc-bada67d1 --availability-zone eu-central-1a
+
+aws ec2 delete-subnet --subnet-id subnet-9d001ff9
+
+
+
+aws ec2 create-tags --resources eipalloc-12345678 --tags Key=Owner,Value=TeamA
+aws ec2 create-tags --resources eipalloc-12345678 --tags Key=Owner,Value=Manu Key=Type, Value=Lab
+aws ec2 create-tags --resources eipalloc-12345678 --tags Key=Owner,Value=Manu Key=Type, Value=Lab
+
+aws ec2 create-tags --resources vpc-bada67d1 --tags Key=Owner,Value=Manu Key=Type,Value=Lab Key=Element,Value=VPC
+aws ec2 create-tags --resources subnet-1e910253 --tags Key=Owner,Value=Manu Key=Type,Value=Lab Key=Element,Value=Subnet_External
+aws ec2 create-tags --resources subnet-747be839 --tags Key=Owner,Value=Manu Key=Type,Value=Lab Key=Element,Value=Subnet_Internal
+aws ec2 create-tags --resources i-0f93497d24fdf720c i-0725795909934f643 i-044e61fbdd8e8d14c --tags Key=Owner,Value=MV Key=Type,Value=Lab Key=Element,Value=EC2_External
+aws ec2 create-tags --resources i-0725795909934f643 --tags Key=Owner,Value=Manu Key=Type,Value=Lab Key=Element,Value=EC2_External
+aws ec2 create-tags --resources i-044e61fbdd8e8d14c --tags Key=Owner,Value=Manu Key=Type,Value=Lab Key=Element,Value=EC2_External
+
+aws ec2 create-internet-gateway
+aws ec2 attach-internet-gateway --internet-gateway-id igw-66bedc0e --vpc-id vpc-bada67d1
+
+
+aws ec2 create-route-table --vpc-id vpc-bada67d1
+aws ec2 create-route --route-table-id rtb-0567416e --destination-cidr-block 0.0.0.0/0 --gateway-id igw-66bedc0e
+aws ec2 delete-route --route-table-id rtb-5ac0ed31 --destination-cidr-block 0.0.0.0/0
+
+aws ec2 associate-route-table --route-table-id rtb-0567416e --subnet-id subnet-1e910253
+{
+    "AssociationId": "rtbassoc-ba2461d0"
+}
+
+! modify security group
+aws ec2 modify-instance-attribute --instance-id i-12345 --groups sg-12345
+
+aws ec2 create-route-table --vpc-id vpc-bada67d1
+aws ec2 create-route --route-table-id rtb-20052e4b --destination-cidr-block 0.0.0.0/0 --gateway-id igw-66bedc0e
+aws ec2 associate-route-table --route-table-id rtb-20052e4b --subnet-id subnet-d8b2f3b3
+{
+    "AssociationId": "rtbassoc-f3a9e399"
+}
+
+aws ec2 disassociate-route-table --association-id rtbassoc-65d4340f
+aws ec2 terminate-instances --instance-ids i-0f93497d24fdf720c i-0725795909934f643 i-044e61fbdd8e8d14c
+aws ec2 terminate-instances --instance-ids i-0e0342de8fba4fb1d i-07aa176cf05f0cf73
+aws ec2 terminate-instances --instance-ids i-05a3989ad79cc36bb
+
+aws ec2 detach-internet-gateway
+aws ec2 detach-internet-gateway --internet-gateway-id IGWID --vpc-id VPCID
+aws ec2 detach-internet-gateway --vpc-id vpc-bf21b1c4 --internet-gateway-id igw-6b72d913
+aws ec2 delete-internet-gateway --internet-gateway-id igw-6b72d913
+
+aws ec2 replace-network-acl-association --association-id  --network-acl-id 
+
+
+aws ec2 create-security-group --group-name DevEnvSG --description "security group for development environment in EC2" --vpc-id vpc-bada67d1
+{
+    "GroupId": "sg-428d2c2f"
+}
+aws ec2 authorize-security-group-ingress –-group-id sg-428d2c2f –-protocol tcp –-port 22 –-cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress –-group-id sg-428d2c2f –-protocol icmp --port -1 –-cidr 0.0.0.0/0
+aws ec2 revoke-security-group-egress –-group-id sg-b3735dde  --protocol all --port all --cidr 0.0.0.0/0
+
+
+aws ec2 create-security-group --group-name WebFromInternet --description "Internet access to ports 80 8080 and 443" --vpc-id vpc-42891e29
+{
+    "GroupId": "sg-3742495a"
+}
+aws ec2 authorize-security-group-ingress –-group-id sg-3742495a –-protocol tcp –-port 8080 –-cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress –-group-id sg-3742495a –-protocol tcp –-port 80 –-cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress –-group-id sg-3742495a –-protocol tcp –-port 443 –-cidr 0.0.0.0/0
+
+!Create Key: 
+aws ec2 create-key-pair --key-name CloudEndure_Key2
+
+!Creating in the External Network
+aws ec2 run-instances --image-id ami-5652ce39 --count 3 --instance-type t2.micro --key-name Key_Frankfurt_2 --security-group-ids sg-428d2c2f --subnet-id subnet-1e910253 
+aws ec2 run-instances --image-id ami-5055cd3f --count 2 --instance-type t2.micro --key-name Key-HP1 --security-group-ids sg-c7bfe5aa --subnet-id subnet-00287d6b 
+
+aws ec2 run-instances --image-id ami-0bdc8fe0 --count 2 --instance-type t2.micro --key-name WinKey --security-group-ids sg-0e2f4463 --subnet-id subnet-00287d6b
+
+!Creating in the Internal network 
+aws ec2 run-instances --image-id ami-5652ce39 --count 1 --instance-type t2.micro --key-name Key_Frankfurt_2 --security-group-ids sg-428d2c2f --subnet-id subnet-747be839 
+
+!
+aws ec2 modify-instance-attribute --instance-id i-0cf09ccd1a3576274 --groups sg-c7bfe5aa sg-3742495a 
+
+
+Commands to create Resource Groups:
+
+ aws resource-groups create-group --name resource-group-name --resource-query '{"Type":"TAG_FILTERS_1_0","Query":"{\"ResourceTypeFilters\":[\"resource_type1\",\"resource_type2"],\"TagFilters\":[{\"Key\":\"Key1\",\"Values\":[\"Value1\",\"Value2\"]},{\"Key\":\"Key2\",\"Values\":[\"Value1\",\"Value2\"]}]}"}'
+
+ aws resource-groups create-group --name my-resource-group --resource-query '{"Type":"TAG_FILTERS_1_0","Query":"{\"ResourceTypeFilters\":[\"AWS::EC2::Instance\"],\"TagFilters\":[{\"Key\":\"Stage\",\"Values\":[\"Test\"]}]}"}'
+
+In the AWS CLI, you update groups in two commands:
+ update-group, which you run to update a group's description
+ 
+ aws resource-groups update-group --group-name my-resource-group --description "EC2 instances, S3 buckets, and RDS DBs that we are using for the test stage."
+ 
+ 
+ update-group-query, which you run to update the resource query and tags that determine the group's member resources. 
+ 
+ aws resource-groups update-group-query --name my-resource-group --resource-query '{"Type":"TAG_FILTERS_1_0","Query":"{\"ResourceTypeFilters\":[\"AWS::EC2::Instance\",\"AWS::S3::Bucket\",\"AWS::RDS::DBInstance\"],\"TagFilters\":[{\"Key\":\"Stage\",\"Values\":[\"Test\"]}]}"}'
+
+
+To delete Groups:
+ aws resource-groups delete-group --group-name resource_group_name
+ 
+ 
+ ---------------------------S3 IMPORTANT Info
+Amazon S3 supports both virtual-hosted–style and path-style URLs to access a bucket. 
+
+•In a virtual-hosted–style URL, the bucket name is part of the domain name in the URL. For example:   
+◦http://bucket.s3.amazonaws.com
+◦http://bucket.s3-aws-region.amazonaws.com. 
+In a virtual-hosted–style URL, you can use either of these endpoints. If you make a request to the http://bucket.s3.amazonaws.com endpoint, the DNS has sufficient information to route your request directly to the Region where your bucket resides. 
+For more information, see Virtual Hosting of Buckets. 
+
+• In a path-style URL, the bucket name is not part of the domain (unless you use a Region-specific endpoint). For example: 
+◦US East (N. Virginia) Region endpoint, http://s3.amazonaws.com/bucket 
+◦Region-specific endpoint, http://s3-aws-region.amazonaws.com/bucket
+
+In a path-style URL, the endpoint you use must match the Region in which the bucket resides. For example, if your bucket is in the South America (São Paulo) Region, you must use the http://s3-sa-east-1.amazonaws.com/bucket endpoint. If your bucket is in the US East (N. Virginia) Region, you must use the http://s3.amazonaws.com/bucket endpoint. 
+
+Important
+
+Because buckets can be accessed using path-style and virtual-hosted–style URLs, we recommend you create buckets with DNS-compliant bucket names. For more information, see Bucket Restrictions and Limitations. 
+ 
+
+ 
+ ----------------------------------S3 CLI--------------------------------------------
+ 
+https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html
+ Static Website:
+ If bucket name: webserver-try1
+ Region: eu-central-1 
+ 
+ http://webserver-try1.s3-website.eu-central-1.amazonaws.com/
+ 
+ 
+ aws s3 mb s3://my-first-backup-bucket-for-manuel-villate 
+ 
+ aws s3 rb s3://my-first-backup-bucket-for-manuel-villate
+ 
+ mb = make bucket
+ rb = remove buket
+ 
+aws s3 cp index.html s3://allvpc.net
+upload: .\index.html to s3://allvpc.net/index.html
+
+To sync up one folder in the laptop with AWS 
+aws s3 sync . s3://allvpc.net/ --acl public-read
+upload: .\allvpc.net to s3://allvpc.net/index.html
+
+
+https://eu-west-1-replicator-docker-2cea5be35b.s3.amazonaws.com/d42e03061390fa43480aab9cbde1622d6e8914f9/cgroup.deb?Signature=Bdmoliein%2BMWmqk9FpZnupIYFoE%3D&Expires=1527005231&AWSAccessKeyId=AKIAIGTDYPVZNOTKEGOQ&x-amz-meta-s3cmd-attrs=uid%3A0/gname%3Aroot/uname%3Aroot/gid%3A0/mode%3A33188/mtime%3A1526207613/atime%3A1526208108/md5%3Afe1749ba83aaf6d4f3e87ccdbc3581d4/ctime%3A1526207736
+ 
+ 
+---------------------------------DNS General Info and Addressing----------------
+https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html
+The first four IP addresses and the last IP address in each subnet CIDR block are not available for you to use, and cannot be assigned to an instance. For example, in a subnet with CIDR block 10.0.0.0/24, the following five IP addresses are reserved: 
+•10.0.0.0: Network address. 
+•10.0.0.1: Reserved by AWS for the VPC router. 
+•10.0.0.2: Reserved by AWS. The IP address of the DNS server is always the base of the VPC network range plus two; however, we also reserve the base of each subnet range plus two. For VPCs with multiple CIDR blocks, the IP address of the DNS server is located in the primary CIDR. For more information, see Amazon DNS Server. 
+•10.0.0.3: Reserved by AWS for future use. 
+•10.0.0.255: Network broadcast address. We do not support broadcast in a VPC, therefore we reserve this address. 
+
+-----------------------DNS from a server not connected to Internet (But VPC connected)--------------
+[ec2-user@ip-10-0-200-52 ~]$ dig google.com
+; <<>> DiG 9.8.2rc1-RedHat-9.8.2-0.62.rc1.56.amzn1 <<>> google.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 15687
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;google.com.                    IN      A
+
+;; ANSWER SECTION:
+google.com.             60      IN      A       216.58.207.78
+
+;; Query time: 1 msec
+;; SERVER: 10.0.0.2#53(10.0.0.2)
+;; WHEN: Tue Mar 13 17:18:25 2018
+;; MSG SIZE  rcvd: 44
+
+[ec2-user@ip-10-0-200-52 ~]$ ping google.com
+PING google.com (216.58.207.78) 56(84) bytes of data.
+^C
+--- google.com ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1022ms
+
+-----------------------DNS from a server  connected to Internet --------------
+
+[ec2-user@ip-10-0-100-33 ~]$ dig google.com
+
+; <<>> DiG 9.8.2rc1-RedHat-9.8.2-0.62.rc1.57.amzn1 <<>> google.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 65196
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;google.com.                    IN      A
+
+;; ANSWER SECTION:
+google.com.             54      IN      A       172.217.22.110
+
+;; Query time: 0 msec
+;; SERVER: 10.0.0.2#53(10.0.0.2)
+;; WHEN: Tue Mar 13 17:19:57 2018
+;; MSG SIZE  rcvd: 44
+
+[ec2-user@ip-10-0-100-33 ~]$ ping google.com
+PING google.com (172.217.22.110) 56(84) bytes of data.
+64 bytes from fra15s18-in-f14.1e100.net (172.217.22.110): icmp_seq=1 ttl=53 time=1.13 ms
+64 bytes from fra15s18-in-f110.1e100.net (172.217.22.110): icmp_seq=2 ttl=53 time=1.22 ms
+64 bytes from fra15s18-in-f14.1e100.net (172.217.22.110): icmp_seq=3 ttl=53 time=1.17 ms
+^C
+--- google.com ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2002ms
+rtt min/avg/max/mdev = 1.130/1.177/1.226/0.048 ms
+
+--------------------------------AWS DNS Names------------------------
+com.amazonaws.eu-central-1.s3 is the service name 
+
+The names for the services are:
+  s3.eu-central-1.amazonaws.com
+  kms.eu-central-1.amazonaws.com
+  ec2.eu-central-1.amazonaws.com
+
+--------------------------------AWS VPC peering/endpoints------------------------
+VPC Endpoints Gateway (VPC Peering) have
+	- S3 
+	- dynamoDB
+VPC Endpoint type interface have the following services:
+	- Codebuild
+	- ec2
+	- ec2messages
+	- elasticloadbalancing
+	- execute-api
+	- kms
+	- servicecatalog
+	- sns
+	- ssm
+	
+To use private DNS names, ensure that the attributes 'Enable DNS hostnames' 
+and 'Enable DNS Support' are set to 'true' for your VPC
+
+-----------------------------------SSH from linux to linux using the certificate
+chmod 0700 Key_Frankfurt_2.pem
+ssh -i Key_Frankfurt_2.pem ec2-user@10.0.200.52
+
+
+-----------------------------------PROXY configuration in linux
+export http_proxy=http://10.48.202.100:8008/
+export https_proxy=https://10.48.202.100:8008/
+
+To verify the proxy:
+echo $http_proxy
+echo $https_proxy
+
+Remove the proxy config:
+unset http_proxy
+unset https_proxy
+
+Proxy with Authentication
+$ export http_proxy="http://USER:PASSWORD@PROXY_SERVER:PORT"
+$ export https_proxy="https://USER:PASSWORD@PROXY_SERVER:PORT"
+$ export ftp_proxy="http://USER:PASSWORD@PROXY_SERVER:PORT"
+
+How to make it valid for al the users?
+How to make it valid after the reboots?
+
+-----------------------------------NTP General----------------------------
+timedatectl status
+ubuntu@ip-10-0-110-82:/etc/systemd$ timedatectl status
+      Local time: Wed 2018-03-14 11:35:18 UTC
+  Universal time: Wed 2018-03-14 11:35:18 UTC
+        RTC time: Wed 2018-03-14 11:35:18
+       Time zone: Etc/UTC (UTC, +0000)
+ Network time on: yes
+NTP synchronized: yes
+ RTC in local TZ: no
+
+ubuntu@ip-10-0-110-82:/etc/systemd$ systemctl status systemd-timesyncd
+● systemd-timesyncd.service - Network Time Synchronization
+   Loaded: loaded (/lib/systemd/system/systemd-timesyncd.service; enabled; vendor preset: enabled)
+  Drop-In: /lib/systemd/system/systemd-timesyncd.service.d
+           └─disable-with-time-daemon.conf
+   Active: active (running) since Wed 2018-03-14 10:28:35 UTC; 1h 7min ago
+     Docs: man:systemd-timesyncd.service(8)
+ Main PID: 530 (systemd-timesyn)
+   Status: "Synchronized to time server 91.189.91.157:123 (ntp.ubuntu.com)."
+    Tasks: 2
+   Memory: 552.0K
+      CPU: 15ms
+   CGroup: /system.slice/systemd-timesyncd.service
+           └─530 /lib/systemd/systemd-timesyncd
+
+Mar 14 10:29:46 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.89.199:123 (ntp.ubu
+Mar 14 10:30:28 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.91.157:123 (ntp.ubu
+Mar 14 10:30:39 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.94.4:123 (ntp.ubunt
+Mar 14 10:30:49 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.89.198:123 (ntp.ubu
+Mar 14 10:30:59 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.89.199:123 (ntp.ubu
+Mar 14 10:32:14 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.89.199:123 (ntp.ubu
+Mar 14 10:32:24 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.91.157:123 (ntp.ubu
+Mar 14 10:32:34 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.94.4:123 (ntp.ubunt
+Mar 14 10:32:44 ip-10-0-110-82 systemd-timesyncd[530]: Timed out waiting for reply from 91.189.89.198:123 (ntp.ubu
+Mar 14 10:34:54 ip-10-0-110-82 systemd-timesyncd[530]: Synchronized to time server 91.189.91.157:123 (ntp.ubuntu.c
+ubuntu@ip-10-0-110-82:/etc/systemd$ date
+Wed Mar 14 11:36:24 UTC 2018
+
+
+Additional NTP config can be done here:
+/etc/systemd/timesyncd.conf
+
+-------------------TEMPLATES----------------------
+### Security Group Templates:
+aws ec2 create-security-group --group-name Basic_Svcs_SG --description "Basic_Svcs_SG" --vpc-id vpc-3f4d5557
+{
+    "GroupId": "sg-111"
+}
+aws ec2 authorize-security-group-ingress –-group-id sg-111 –-protocol icmp –-port all –-cidr 0.0.0.0/0
+aws ec2 revoke-security-group-egress –-group-id sg-111  --protocol all --port all --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-egress –-group-id sg-111 –-protocol udp –-port 53 –-cidr 0.0.0.0/0
+aws ec2 authorize-security-group-egress –-group-id sg-111 –-protocol icmp –-port all –-cidr 0.0.0.0/0
+
+
+aws ec2 create-security-group --group-name UX_Management_SG --description "UX_Management_SG-FromMMB" --vpc-id vpc-3f4d5557
+{
+    "GroupId": "sg-211"
+}
+aws ec2 authorize-security-group-ingress –-group-id sg-211 –-protocol tcp –-port 22 –-cidr 10.48.62.0/24
+aws ec2 authorize-security-group-ingress –-group-id sg-211 –-protocol tcp –-port 22 –-cidr 10.49.62.0/24
+aws ec2 authorize-security-group-ingress –-group-id sg-211 –-protocol tcp –-port 22 –-cidr 10.48.64.0/18
+aws ec2 revoke-security-group-egress –-group-id sg-211  --protocol all --port all --cidr 0.0.0.0/0
+
+aws ec2 create-security-group --group-name WIN_Management_SG --description "WIN_Management_SG-FromMMB" --vpc-id vpc-3f4d5557
+{
+    "GroupId": "sg-212"
+}
+aws ec2 authorize-security-group-ingress –-group-id sg-212 –-protocol tcp –-port 3389 –-cidr 10.48.62.0/24
+aws ec2 authorize-security-group-ingress –-group-id sg-212 –-protocol tcp –-port 3389 –-cidr 10.49.62.0/24
+aws ec2 authorize-security-group-ingress –-group-id sg-212 –-protocol tcp –-port 3389 –-cidr 10.48.64.0/18
+aws ec2 revoke-security-group-egress –-group-id sg-212  --protocol all --port all --cidr 0.0.0.0/0
+
+aws ec2 create-security-group --group-name ReplicationSrvr-CloudEndure-PoC --description "CE_PoC_ReplicationServer_SG" --vpc-id vpc-3f4d5557
+{
+    "GroupId": "sg-311"
+}
+aws ec2 authorize-security-group-ingress –-group-id sg-311 –-protocol tcp –-port 1500 –-cidr 10.48.4.61/32
+aws ec2 authorize-security-group-ingress –-group-id sg-311 –-protocol tcp –-port 1500 –-cidr 10.48.4.100/32
+aws ec2 authorize-security-group-ingress –-group-id sg-311 –-protocol tcp –-port 1500 –-cidr 10.49.6.133/32
+aws ec2 authorize-security-group-ingress –-group-id sg-311 –-protocol tcp –-port 1500 –-cidr 10.49.6.240/32
+aws ec2 authorize-security-group-ingress –-group-id sg-311 –-protocol tcp –-port 1500 –-cidr 10.48.13.30/32
+aws ec2 revoke-security-group-egress –-group-id sg-311  --protocol all --port all --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-egress –-group-id sg-311 –-protocol tcp –-port 8008 –-cidr 10.48.202.100/32
+
+-------------------- Red Hat versions------------------
+'cat /etc/redhat-release' 
+
+To make a process survive reboot:
+To auto start a new service:
+1.Find out the name of service’s script from /etc/init.d/ directory e.g. mysqld or httpd
+2.Add it to chkconfig
+sudo /sbin/chkconfig --add mysqld
+3.Make sure it is in the chkconfig.
+sudo /sbin/chkconfig --list mysqld
+4.Set it to autostart
+sudo /sbin/chkconfig mysqld on
+
+To stop a service from auto starting on boot
+sudo /sbin/chkconfig mysqld off
+
+--------------------NGINX
+cd /usr/share/nginx/html
+vi index.html
+
+Configuration file /etc/nginx/conf.d/
+
+Top config file: /etc/nginx
+
+---------------HTML-------------------
+ to insert text "
+ is space" 
+
+
+
