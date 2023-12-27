@@ -31,8 +31,7 @@ log_group_name=`aws logs describe-log-groups  --log-group-name-pattern "^aws-clo
 set -x
 
 # Variables
-#log_group_name="aws-cloudtrail-logs-278506630753-b4ca076e"
-agency_prefix="CS-UAT"
+agency_prefix="<PROJECT_NAME>-<ENV>"
 cybersecurity_response_plan_arn="arn:aws:ssm-incidents::$ACC_ID:response-plan/Cybersecurity-Response-Plan"
 
 ###################################################################################################################################
@@ -54,8 +53,7 @@ aws logs put-metric-filter --log-group-name "${log_group_name}" --filter-name VP
 aws logs put-metric-filter --log-group-name "${log_group_name}" --filter-name AWSConfigChanges --metric-transformations metricName=AWSConfigChangesEvent,metricNamespace=LogMetrics,metricValue=1,defaultValue=0 --filter-pattern '{($.eventSource=config.amazonaws.com) && (($.eventName=StopConfigurationRecorder) || ($.eventName=DeleteDeliveryChannel) || ($.eventName=PutDeliveryChannel) || ($.eventName=PutConfigurationRecorder))}'
 aws logs put-metric-filter --log-group-name "${log_group_name}" --filter-name RootAccountUsage --metric-transformations metricName=RootAccountUsageEvent,metricNamespace=LogMetrics,metricValue=1,defaultValue=0 --filter-pattern '{$.userIdentity.type="Root" && $.userIdentity.invokedBy NOT EXISTS && $.eventType !="AwsServiceEvent"}'
 }
-CREATE_ALL_CYBERSECURITY_LOG_METRICS_ALARM
-
+CREATE_ALL_SECURITY_ALARMS() {
 echo "Creating all security alarms now..."
 aws cloudwatch put-metric-alarm --alarm-name "${agency_prefix} - UnauthorizedAPICallsEvent" --metric-name UnauthorizedAPICallsEvent --namespace LogMetrics --statistic Sum --period 300 --comparison-operator GreaterThanOrEqualToThreshold --threshold 1 --alarm-actions "${cybersecurity_response_plan_arn}" --evaluation-periods 1
 aws cloudwatch put-metric-alarm --alarm-name "${agency_prefix} - IAMPolicyChangesEvent" --metric-name IAMPolicyChangesEvent --namespace LogMetrics --statistic Sum --period 300 --comparison-operator GreaterThanOrEqualToThreshold --threshold 1 --alarm-actions "${cybersecurity_response_plan_arn}" --evaluation-periods 1
@@ -70,6 +68,8 @@ aws cloudwatch put-metric-alarm --alarm-name "${agency_prefix} - NetworkGatewayC
 aws cloudwatch put-metric-alarm --alarm-name "${agency_prefix} - VPCChangesEvent" --metric-name VPCChangesEvent --namespace LogMetrics --statistic Sum --period 300 --comparison-operator GreaterThanOrEqualToThreshold --threshold 1 --alarm-actions "${cybersecurity_response_plan_arn}" --evaluation-periods 1
 aws cloudwatch put-metric-alarm --alarm-name "${agency_prefix} - AWSConfigChangesEvent" --metric-name AWSConfigChangesEvent --namespace LogMetrics --statistic Sum --period 300 --comparison-operator GreaterThanOrEqualToThreshold --threshold 1 --alarm-actions "${cybersecurity_response_plan_arn}" --evaluation-periods 1
 aws cloudwatch put-metric-alarm --alarm-name "${agency_prefix} - RootAccountUsageEvent" --metric-name RootAccountUsageEvent --namespace LogMetrics --statistic Sum --period 300 --comparison-operator GreaterThanOrEqualToThreshold --threshold 1 --alarm-actions "${cybersecurity_response_plan_arn}" --evaluation-periods 1
-
+}
+CREATE_ALL_CYBERSECURITY_LOG_METRICS_ALARM
+CREATE_ALL_SECURITY_ALARMS
 # Stop logging every commands
 set +x
