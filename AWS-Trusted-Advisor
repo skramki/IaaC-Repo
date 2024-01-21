@@ -83,64 +83,6 @@ for i in `cat s3-bucket.txt`; do echo "Backup status of $i"; aws s3api get-bucke
 # aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True}]'
 aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True},{Key=Agency-code,Value=imda},{Key=Environment,Value=uat},{Key=Project-Code,Value=imda},{Key=Name,Value=imda0001-aws-161-imdauat}]'
 
-[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api get-bucket-tagging --bucket  imda0001-aws-161-imdauat
-{
-    "TagSet": [
-        {
-            "Key": "Agency-Code",
-            "Value": "imda"
-        },
-        {
-            "Key": "Environment",
-            "Value": "uat"
-        },
-        {
-            "Key": "Project-Code",
-            "Value": "imda"
-        },
-        {
-            "Key": "Name",
-            "Value": "imda0001-aws-161-imdauat"
-        }
-    ]
-}
-[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True}]'
-[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api get-bucket-tagging --bucket  imda0001-aws-161-imdauat
-{
-    "TagSet": [
-        {
-            "Key": "snapshotbackup",
-            "Value": "True"
-        }
-    ]
-}
-[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True},{Key=Agency-code,Value=imda},{Key=Environment,Value=uat},{Key=Project-Code,Value=imda},{Key=Name,Value=imda0001-aws-161-imdauat}]'
-[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api get-bucket-tagging --bucket  imda0001-aws-161-imdauat{
-    "TagSet": [
-        {
-            "Key": "Environment",
-            "Value": "uat"
-        },
-        {
-            "Key": "snapshotbackup",
-            "Value": "True"
-        },
-        {
-            "Key": "Project-Code",
-            "Value": "imda"
-        },
-        {
-            "Key": "Agency-code",
-            "Value": "imda"
-        },
-        {
-            "Key": "Name",
-            "Value": "imda0001-aws-161-imdauat"
-        }
-    ]
-}
-[cloudshell-user@ip-10-6-62-222 ~]$ 
-
 ###################### S3 SSL Only access
 
 	{
