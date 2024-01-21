@@ -1,0 +1,167 @@
+AWS::Backup::BackupVault
+Solution:
+Add a statement in Backup vault access policy which denies all principals to action: backup:DeleteRecoveryPoint. To modify the access policy, please refer to the following link:
+
+https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-vault-access-policy.html#deny-access-to-delete-recovery-points
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Principal": {
+                "AWS": "*"
+            },
+            "Action": [
+                "backup:DeleteBackupVault",
+                "backup:DeleteBackupVaultAccessPolicy",
+                "backup:DeleteRecoveryPoint",
+                "backup:StartCopyJob",
+                "backup:StartRestoreJob",
+                "backup:UpdateRecoveryPointLifecycle"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
+########
+AWS::EC2::Instance
+
+
+#!/bin/sh
+echo "Before IMDSv2 execution" > IDMSv2_20240119.log
+aws ec2 describe-instances --region=ap-southeast-1 --query Reservations[*].Instances[*].MetadataOptions >> IDMSv2_20240119_after.log
+for i in `cat imdsv2.txt`
+do
+        echo "Before IMDSv2 execution" >> IDMSv2_20240119.log
+        aws ec2 modify-instance-metadata-options --instance-id $i --http-endpoint enabled --http-tokens required --region=ap-southeast-1 >> IDMSv2.log
+        echo "After IMDSv2 execution" >> IDMSv2_20240119.log 
+done
+
+####
+AWS::EC2::Instance
+To assign EC2 instances to be covered by a backup plan, please refer to the following link:
+
+######### Enable S3 Bucket Versioning ########
+Step 1:	( Pre-Check )
+for i in `cat s3-bucket.txt`; do S3_BUCK_VERS=`aws s3api get-bucket-versioning --bucket $i --output text`; echo "S3 $i Version status: $S3_BUCK_VERS"; done
+Step 2: ( Implementation )
+for i in `cat s3-bucket.txt`; do aws s3api put-bucket-versioning --bucket $i --versioning-configuration Status=Enabled; S3_BUCK_VERS=`aws s3api get-bucket-versioning --bucket $i --output text`; echo "S3 $i Version status: $S3_BUCK_VERS"; done
+Step 3:	( Post-Check )
+for i in `cat s3-bucket.txt`; do S3_BUCK_VERS=`aws s3api get-bucket-versioning --bucket $i --output text`; echo "S3 $i Version status: $S3_BUCK_VERS"; done
+
+
+https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html#assigning-resources-console
+
+aws ec2 describe-tags --filters Key=snapshotbackup,Values=true
+aws ec2 describe-tags --filters Name=Agency-Code,Values=mccy
+"Key": "snapshotbackup", "Value": "true"
+
+# EC2 Instance Snapshot backup enable ( Tag Key value: snapshotbackup True )
+Step 1:	( Pre-Check )
+for i in `cat backup-instance-id.txt`; do echo "Backup status of $i"; aws ec2 describe-tags     --filters "Name=resource-id,Values=$i"  --query 'Tags[?Key==`snapshotbackup`].Value[]'  --output text; done
+# aws ec2 create-tags --resources i-04155aabcb05a5bd9    --tags 'Key=snapshotbackup,Value=True'
+Step 2: ( Implementation )
+for i in `cat backup-instance-id.txt`; do echo "Backup status of $i"; aws ec2 create-tags --resources $i --tags 'Key=snapshotbackup,Value=True'; aws ec2 describe-tags --filters "Name=resource-id,Values=$i"  --query 'Tags[?Key==`snapshotbackup`].Value[]'  --output text; done	
+Step 3:	( Post-Check )
+for i in `cat backup-instance-id.txt`; do echo "Backup status of $i"; aws ec2 describe-tags     --filters "Name=resource-id,Values=$i"  --query 'Tags[?Key==`snapshotbackup`].Value[]'  --output text; done
+
+# Volume Snapshot backup enable ( Tag Key value: snapshotbackup True )
+Step 1:	( Pre-Check )
+for i in `cat backup-volume-id.txt`; do echo "Backup status of $i"; aws ec2 describe-volumes  --volume-ids $i --query 'Volumes[*].Tags[?Key==`snapshotbackup`].Value[]' --output text; done
+Step 2: ( Implementation )
+for i in `cat backup-volume-id.txt`; do echo "Backup status of $i"; aws ec2 create-tags --resources $i --tags 'Key=snapshotbackup,Value=True'; aws ec2 describe-volumes  --volume-ids $i --query 'Volumes[*].Tags[?Key==`snapshotbackup`].Value[]' --output text;  done	
+Step 3:	( Post-Check )
+for i in `cat backup-volume-id.txt`; do echo "Backup status of $i"; aws ec2 describe-volumes  --volume-ids $i --query 'Volumes[*].Tags[?Key==`snapshotbackup`].Value[]' --output text; done
+
+# S3 Buckey backup enable ( Tag Key value: snapshotbackup True )
+
+Step 1:	( Pre-Check )
+for i in `cat s3-bucket.txt`; do echo "Backup status of $i"; aws s3api get-bucket-tagging --bucket $i --query 'TagSet[?Key==`Name`].Value[]' --output text; done
+
+# aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True}]'
+aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True},{Key=Agency-code,Value=imda},{Key=Environment,Value=uat},{Key=Project-Code,Value=imda},{Key=Name,Value=imda0001-aws-161-imdauat}]'
+
+[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api get-bucket-tagging --bucket  imda0001-aws-161-imdauat
+{
+    "TagSet": [
+        {
+            "Key": "Agency-Code",
+            "Value": "imda"
+        },
+        {
+            "Key": "Environment",
+            "Value": "uat"
+        },
+        {
+            "Key": "Project-Code",
+            "Value": "imda"
+        },
+        {
+            "Key": "Name",
+            "Value": "imda0001-aws-161-imdauat"
+        }
+    ]
+}
+[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True}]'
+[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api get-bucket-tagging --bucket  imda0001-aws-161-imdauat
+{
+    "TagSet": [
+        {
+            "Key": "snapshotbackup",
+            "Value": "True"
+        }
+    ]
+}
+[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api put-bucket-tagging --bucket  imda0001-aws-161-imdauat --tagging 'TagSet=[{Key=snapshotbackup,Value=True},{Key=Agency-code,Value=imda},{Key=Environment,Value=uat},{Key=Project-Code,Value=imda},{Key=Name,Value=imda0001-aws-161-imdauat}]'
+[cloudshell-user@ip-10-6-62-222 ~]$ aws s3api get-bucket-tagging --bucket  imda0001-aws-161-imdauat{
+    "TagSet": [
+        {
+            "Key": "Environment",
+            "Value": "uat"
+        },
+        {
+            "Key": "snapshotbackup",
+            "Value": "True"
+        },
+        {
+            "Key": "Project-Code",
+            "Value": "imda"
+        },
+        {
+            "Key": "Agency-code",
+            "Value": "imda"
+        },
+        {
+            "Key": "Name",
+            "Value": "imda0001-aws-161-imdauat"
+        }
+    ]
+}
+[cloudshell-user@ip-10-6-62-222 ~]$ 
+
+###################### S3 SSL Only access
+
+	{
+		"Version": "2012-10-17",
+		"Id": "S3SecureTransportPolicy",
+		"Statement": [
+			{
+				"Sid": "ForceSSLOnlyAccess",
+				"Effect": "Deny",
+				"Principal": {
+					"AWS": "*"
+				},
+				"Action": "s3:*",
+				"Resource": "arn:aws:s3:::sst-943107371265-cloudtrails3bucket/*",
+				"Condition": {
+					"Bool": {
+						"aws:SecureTransport": "false"
+					}
+				}
+			}
+		]
+	}
+		
+			
